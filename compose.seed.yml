@@ -1,0 +1,6 @@
+# Temporary overlay; remove from the running stack after seeding.
+services:
+  web:
+    env_file: .env.seed.local
+    volumes:
+      - ./deploy/local/seed/registration.rb:/opt/mastodon/config/initializers/zz_local_fixture.rb:ro

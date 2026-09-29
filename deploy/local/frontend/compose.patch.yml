@@ -1,0 +1,3 @@
+services:
+  web:
+    image: ${MASTODON_PATCH_IMAGE:?Run deploy/local/frontend/patch.ps1 Apply}

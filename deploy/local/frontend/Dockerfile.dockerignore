@@ -1,0 +1,8 @@
+**
+!deploy/
+!deploy/local/
+!deploy/local/frontend/
+!deploy/local/frontend/patch-explore.mjs
+!deploy/local/frontend/live.jsx
+!deploy/local/frontend/threaded_replies.jsx
+!deploy/local/frontend/threaded_replies.module.scss

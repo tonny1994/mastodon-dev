@@ -1,0 +1,117 @@
+name: mastodon-local
+
+x-app: &app
+  image: ghcr.io/mastodon/mastodon:v4.7.2
+  restart: unless-stopped
+  env_file: .env.production
+  volumes:
+    - media:/mastodon/public/system
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file: .env.db.local
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U mastodon -d mastodon_production']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: [redis-server, --appendonly, 'yes']
+    volumes:
+      - redis:/data
+    networks: [internal]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  init-media:
+    image: ghcr.io/mastodon/mastodon:v4.7.2
+    user: '0:0'
+    entrypoint: [sh, -c, 'chown 991:991 /mastodon/public/system']
+    network_mode: none
+    volumes:
+      - media:/mastodon/public/system
+  web:
+    <<: *app
+    command: bundle exec puma -C config/puma.rb
+    networks:
+      internal:
+      edge:
+        aliases: [mastodon-app]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      init-media:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:3000/health]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 90s
+  streaming:
+    image: ghcr.io/mastodon/mastodon-streaming:v4.7.2
+    restart: unless-stopped
+    env_file: .env.production
+    command: node ./streaming/index.js
+    networks:
+      internal:
+      edge:
+        aliases: [mastodon-stream]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, -fsS, http://localhost:4000/api/v1/streaming/health]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+  sidekiq:
+    <<: *app
+    command: bundle exec sidekiq
+    networks: [internal, outbound]
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, "ps aux | grep '[s]idekiq 8'"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+  mailpit:
+    image: axllent/mailpit:v1.31.3
+    restart: unless-stopped
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: '500'
+    volumes:
+      - mailpit:/data
+    ports:
+      - '127.0.0.1:8026:8025'
+    networks: [internal, outbound]
+
+networks:
+  internal:
+    internal: true
+  outbound:
+  edge:
+    external: true
+    name: misskey-local_external
+
+volumes:
+  postgres:
+  redis:
+  media:
+  mailpit:

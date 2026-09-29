@@ -1,0 +1,126 @@
+.group {
+  border-bottom: 1px solid var(--color-border-primary);
+  padding-bottom: 8px;
+
+  :global(.status__line) {
+    display: none;
+  }
+}
+
+.replies {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+.repliesInner {
+  flex: none;
+}
+
+.child {
+  margin-inline-start: 44px;
+
+  :global(.status) {
+    padding: 9px 16px 8px 0;
+  }
+
+  :global(.status__info) {
+    padding-bottom: 5px;
+  }
+
+  :global(.status__avatar),
+  :global(.account__avatar) {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  :global(.display-name__account) {
+    display: none !important;
+  }
+
+  :global(.status__relative-time) {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    height: auto;
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+  }
+
+  :global(.status__visibility-icon svg) {
+    width: 14px;
+    height: 14px;
+  }
+
+  :global(.status__content),
+  :global(.status__action-bar) {
+    margin-inline-start: 44px;
+  }
+
+  :global(.status__content) {
+    padding-top: 0;
+    font-size: 14px;
+    line-height: 21px;
+  }
+
+  :global(.status__content .mention) {
+    color: var(--color-text-brand);
+  }
+
+  :global(.status__action-bar) {
+    justify-content: flex-start;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  :global(.status__action-bar__button-wrapper) {
+    flex: none;
+  }
+
+  :global(.status__action-bar__button-wrapper:last-child) {
+    margin-inline-start: auto;
+  }
+
+  :global(.status__action-bar__button) {
+    min-width: 28px;
+    min-height: 28px;
+    font-size: 12px;
+  }
+
+  :global(.status__action-bar__button svg) {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.toggle,
+.loadMore {
+  display: block;
+  border: 0;
+  background: none;
+  color: var(--color-text-brand);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: start;
+}
+
+.toggle {
+  margin-inline-start: 70px;
+  padding: 10px 0;
+}
+
+.loadMore {
+  padding: 16px;
+  width: 100%;
+}
+
+.toggle:hover,
+.toggle:focus-visible,
+.loadMore:hover,
+.loadMore:focus-visible {
+  text-decoration: underline;
+}
